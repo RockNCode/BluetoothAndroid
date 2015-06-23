@@ -16,15 +16,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/listView"
-        android:layout_below="@id/tvPD"
-        android:layout_above="@+id/bConnectNew" />
-
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="New"
-        android:id="@+id/bConnectNew"
-        android:layout_alignParentBottom="true"
-        />
+        android:layout_below="@id/tvPD" />
 
 </RelativeLayout>

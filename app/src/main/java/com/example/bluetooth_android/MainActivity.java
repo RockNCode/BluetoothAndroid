@@ -10,6 +10,8 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -19,10 +21,9 @@ import java.util.ArrayList;
 import java.util.Set;
 
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements AdapterView.OnItemClickListener {
 
     ArrayAdapter<String> listAdapter;
-    Button connectNew;
     ListView listView;
     BluetoothAdapter btAdapter;
     Set<BluetoothDevice> devicesArray;
@@ -40,12 +41,17 @@ public class MainActivity extends Activity {
             finish();
         }else{
             if(!btAdapter.isEnabled()){
-                Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                startActivityForResult(intent, 1);
+                turnOnBT();
             }
 
             getPairedDevices();
+            startDiscovery();
         }
+    }
+
+    private void startDiscovery() {
+        btAdapter.cancelDiscovery();
+        btAdapter.startDiscovery();
     }
 
     private void getPairedDevices() {
@@ -66,8 +72,8 @@ public class MainActivity extends Activity {
         }
     }
     private void init() {
-        connectNew = (Button)findViewById(R.id.bConnectNew);
         listView = (ListView)findViewById(R.id.listView);
+        listView.setOnItemClickListener(this);
         listAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,0);
         btAdapter = BluetoothAdapter.getDefaultAdapter();
         listView.setAdapter(listAdapter);
@@ -82,6 +88,17 @@ public class MainActivity extends Activity {
                     BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                     listAdapter.add(device.getName()+"\n"+device.getAddress());
                 }
+                else if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action)){
+
+                }
+                else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)){
+
+                }
+                else if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)){
+                    if(btAdapter.getState() == btAdapter.STATE_OFF){
+                        turnOnBT();
+                    }
+                }
             }
         };
         registerReceiver(receiver,filter);
@@ -93,6 +110,17 @@ public class MainActivity extends Activity {
         registerReceiver(receiver,filter);
     }
 
+    @Override
+    protected void onPause(){
+        super.onPause();
+        unregisterReceiver(receiver);
+    }
+
+    private void turnOnBT() {
+        Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+        startActivityForResult(intent, 1);
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -100,7 +128,9 @@ public class MainActivity extends Activity {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
+    public void onItemClick(AdapterView<?> arg0,View arg1,int arg2,long arg3) {
 
+    }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -115,4 +145,6 @@ public class MainActivity extends Activity {
 
         return super.onOptionsItemSelected(item);
     }
+
+
 }
