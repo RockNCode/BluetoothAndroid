@@ -2,6 +2,7 @@ package com.example.bluetooth_android;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -11,6 +12,8 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.util.Set;
+
 
 public class MainActivity extends Activity {
 
@@ -18,7 +21,7 @@ public class MainActivity extends Activity {
     Button connectNew;
     ListView listView;
     BluetoothAdapter btAdapter;
-
+    Set<BluetoothDevice> devicesArray;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,10 +33,22 @@ public class MainActivity extends Activity {
         }else{
             if(!btAdapter.isEnabled()){
                 Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                startActivityForResult(intent,1);
+                startActivityForResult(intent, 1);
+            }
+
+            getPairedDevices();
+        }
+    }
+
+    private void getPairedDevices() {
+        devicesArray = btAdapter.getBondedDevices();
+        if(devicesArray.size() > 0){
+            for(BluetoothDevice device:devicesArray){
+                listAdapter.add(device.getName()+ "\n"+device.getAddress());
             }
         }
     }
+
     @Override
     protected void onActivityResult(int requestCode,int resultCode,Intent data){
         super.onActivityResult(requestCode,resultCode,data);
