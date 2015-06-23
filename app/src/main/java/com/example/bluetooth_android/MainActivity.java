@@ -26,6 +26,9 @@ public class MainActivity extends Activity {
         connectNew = (Button)findViewById(R.id.bConnectNew);
         listView = (ListView)findViewById(R.id.listView);
         listAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,0);
+        String mArray[] = {"Device 1","Device 2","Device 3"};
+        listAdapter.addAll(mArray);
+        listView.setAdapter(listAdapter);
     }
 
 
