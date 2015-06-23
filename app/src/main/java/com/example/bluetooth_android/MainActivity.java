@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,6 +17,8 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import org.apache.http.entity.StringEntity;
 
 import java.util.ArrayList;
 import java.util.Set;
@@ -79,6 +82,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         listView.setAdapter(listAdapter);
         pairedDevices = new ArrayList<String>();
         filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+
         receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -86,7 +90,17 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 
                 if(BluetoothDevice.ACTION_FOUND.equals(action)){
                     BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                    listAdapter.add(device.getName()+"\n"+device.getAddress());
+
+                    String s = "";
+                    for(int a=0 ; a < pairedDevices.size(); a++){
+                        if(device.getName().equals(pairedDevices.get(a))){
+                            //append
+                            s = s+ "(Paired)";
+                            break;
+                        }
+                    }
+
+                    listAdapter.add(device.getName()+" "+s + " "+"\n"+device.getAddress());
                 }
                 else if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action)){
 
@@ -129,7 +143,11 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         return true;
     }
     public void onItemClick(AdapterView<?> arg0,View arg1,int arg2,long arg3) {
-
+        if(listAdapter.getItem(arg2).contains("Paired")){
+            Toast.makeText(getApplicationContext(),"device is paired", Toast.LENGTH_SHORT).show();
+        }else{
+            Toast.makeText(getApplicationContext(),"device is not paired",Toast.LENGTH_SHORT).show();
+        }
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
